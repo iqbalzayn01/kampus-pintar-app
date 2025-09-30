@@ -1,6 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## KampusPintar: Platform Diskusi Akademik
 
-## Getting Started
+Sebuah platform diskusi akademik terpusat berbasis website yang dirancang untuk menjadi wadah kolaborasi bagi mahasiswa dari berbagai jurusan. Terinspirasi dari model komunitas pada Stack Overflow dan Reddit, sistem ini memfasilitasi mahasiswa untuk bertanya, menjawab, dan membahas topik perkuliahan secara terstruktur.
+
+Fitur unggulan dari platform ini adalah penerapan mekanisme gamifikasi untuk mendorong partisipasi aktif. Setiap kontribusi positif—seperti mengajukan pertanyaan relevan atau memberikan jawaban bermanfaat—akan dihargai dengan poin reputasi.
+
+### Teknologi yang Digunakan
+
+Proyek ini dibangun menggunakan tech stack modern yang efisien dan skalabel:
+
+- Framework: Next.js (App Router)
+
+- Bahasa: TypeScript
+
+- Styling: Tailwind CSS
+
+- ORM: Prisma
+
+- Database: PostgreSQL
+
+- Autentikasi: Auth.js (NextAuth.js)
 
 First, run the development server:
 
