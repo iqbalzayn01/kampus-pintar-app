@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model Topic {
+  id             String     @id @default(uuid())
+  title          String
+  content        String     @db.Text
+  tags           String[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  author         User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId       String
+  responses      Response[]
+  votes          Vote[]
+  bestResponseId String?
+}
+
+model Response {
+  id           String   @id @default(uuid())
+  content      String   @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId     String
+  topic        Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  topicId      String
+  votes        Vote[]
+  isBestAnswer Boolean  @default(false)
+}
+
+model Vote {
+  id         String    @id @default(uuid())
+  type       String
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  topic      Topic?    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  topicId    String?
+  response   Response? @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  responseId String?
+
+  @@unique([userId, topicId])
+  @@unique([userId, responseId])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id            String     @id @default(uuid())
+  name          String?
+  email         String     @unique
+  password      String
+  role          Role       @default(MEMBER)
+  emailVerified DateTime?
+  image         String?
+  points        Int        @default(0)
+  accounts      Account[]
+  sessions      Session[]
+  topics        Topic[]
+  responses     Response[]
+  votes         Vote[]
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
