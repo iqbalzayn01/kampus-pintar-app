@@ -1,17 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { auth } from './lib/auth';
+import { Role } from '@prisma/client';
 
 export default auth(async function middleware(req: NextRequest) {
   const session = await auth();
   const user = session?.user;
+  const userRole = user?.role;
 
   const pathname = req.nextUrl.pathname;
   const url = req.nextUrl.clone();
 
-  const publicRoutes = ['/', '/not-found', '/api'];
+  const publicRoutes = ['/', '/topics', '/not-found', '/api'];
   const authRoutes = ['/login', '/signup'];
 
-  const isPublic = publicRoutes.some((route) => {
+  const isPublicRoute = publicRoutes.some((route) => {
     const pattern = new RegExp(`^${route}(\/|$)`);
     return pattern.test(pathname);
   });
@@ -21,28 +23,26 @@ export default auth(async function middleware(req: NextRequest) {
     return pattern.test(pathname);
   });
 
-  if (!user && !isPublic && !isAuthRoute) {
+  if (!user) {
+    if (isPublicRoute || isAuthRoute) {
+      return NextResponse.next();
+    }
+
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
   if (user) {
-    const role = user.role;
-
     if (isAuthRoute) {
-      url.pathname = role === 'admin' ? '/dashboard' : '/';
-      return NextResponse.redirect(url);
-    }
-
-    if (pathname.startsWith('/dashboard') && role !== 'admin') {
       url.pathname = '/';
       return NextResponse.redirect(url);
     }
 
-    if (pathname.startsWith('/myprofile') && role !== 'member') {
-      url.pathname = '/not-found';
+    if (pathname.startsWith('/dashboard') && userRole !== Role.ADMIN) {
+      url.pathname = '/';
       return NextResponse.redirect(url);
     }
+    return NextResponse.next();
   }
 
   return NextResponse.next();

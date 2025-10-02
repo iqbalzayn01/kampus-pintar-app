@@ -1,10 +1,10 @@
 import { auth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
-// import Logout from '../_components/logout-form';
+import { Logout } from '../_components/logout-form';
 import Link from 'next/link';
 import React from 'react';
 
-export default async function PrivatePage() {
+export default async function MyProfilePage() {
   const session = await auth();
 
   if (!session?.user) return null;
@@ -18,7 +18,7 @@ export default async function PrivatePage() {
         <Button variant="outline" asChild>
           <Link href={`/`}>Home</Link>
         </Button>
-        {/* <Logout /> */}
+        <Logout />
       </section>
     </main>
   );
