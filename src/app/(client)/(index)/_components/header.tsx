@@ -48,9 +48,11 @@ export async function Header() {
               </Button>
             )}
 
-            <Button className="cursor-pointer">
-              <PenSquare className="size-5" />
-              <span className="hidden sm:inline">New Topic</span>
+            <Button asChild>
+              <Link href="/topics/create">
+                <PenSquare className="size-5" />
+                <span className="hidden sm:inline">New Topic</span>
+              </Link>
             </Button>
           </div>
         </div>
