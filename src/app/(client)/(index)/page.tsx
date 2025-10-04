@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/auth';
 import { Header } from './_components/header';
-import { TopicCard } from './_components/topic-card';
+import { TopicCard } from './topics/_components/topic-card';
 import Link from 'next/link';
 
 const mockTopics = [
@@ -61,9 +61,7 @@ const mockTopics = [
   },
 ];
 
-export default async function Home() {
-  const session = await auth();
-
+export default function Home() {
   return (
     <div className="relative font-sans flex flex-col items-center justify-items-center gap-10">
       <Header />

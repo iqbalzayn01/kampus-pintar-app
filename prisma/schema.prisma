@@ -16,7 +16,7 @@ datasource db {
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-model Topic {
+model Threads {
   id             String     @id @default(uuid())
   title          String
   content        String     @db.Text
@@ -37,8 +37,8 @@ model Response {
   updatedAt    DateTime @updatedAt
   author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId     String
-  topic        Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  topicId      String
+  thread       Threads  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId     String
   votes        Vote[]
   isBestAnswer Boolean  @default(false)
 }
@@ -49,12 +49,12 @@ model Vote {
   createdAt  DateTime  @default(now())
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  topic      Topic?    @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  topicId    String?
+  thread     Threads?  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId   String?
   response   Response? @relation(fields: [responseId], references: [id], onDelete: Cascade)
   responseId String?
 
-  @@unique([userId, topicId])
+  @@unique([userId, threadId])
   @@unique([userId, responseId])
 }
 
@@ -72,7 +72,7 @@ model User {
   emailVerified DateTime?
   image         String?
   points        Int        @default(0)
-  topics        Topic[]
+  threads       Threads[]
   responses     Response[]
   votes         Vote[]
 }
