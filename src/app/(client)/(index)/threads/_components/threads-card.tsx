@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-interface TopicCardProps {
+interface ThreadsCardProps {
   id: string;
   title: string;
   authorName: string;
@@ -16,7 +16,7 @@ interface TopicCardProps {
   createdAt?: string;
 }
 
-export function TopicCard({
+export function ThreadsCard({
   id,
   title,
   authorName,
@@ -25,7 +25,7 @@ export function TopicCard({
   voteCount,
   responseCount,
   createdAt,
-}: TopicCardProps) {
+}: ThreadsCardProps) {
   const initials = authorName
     .split(' ')
     .map((n) => n[0])
@@ -34,7 +34,7 @@ export function TopicCard({
     .slice(0, 2);
 
   return (
-    <Link href={`/topics/${id}`}>
+    <Link href={`/threads/${id}`}>
       <Card className="p-6 hover:bg-card-hover transition-colors cursor-pointer border-border">
         <div className="flex gap-4">
           {/* Vote Section */}

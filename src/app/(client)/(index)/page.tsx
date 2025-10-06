@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/auth';
 import { Header } from './_components/header';
-import { TopicCard } from './topics/_components/topic-card';
+import { ThreadsCard } from './threads/_components/threads-card';
 import Link from 'next/link';
 
-const mockTopics = [
+const mockThreads = [
   {
     id: '1',
     title:
@@ -68,8 +68,8 @@ export default function Home() {
 
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div className="space-y-4">
-          {mockTopics.map((topic) => (
-            <TopicCard key={topic.id} {...topic} />
+          {mockThreads.map((topic) => (
+            <ThreadsCard key={topic.id} {...topic} />
           ))}
         </div>
       </main>

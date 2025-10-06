@@ -31,7 +31,7 @@ export const userSchema = z.object({
 
 export type UserType = z.infer<typeof userSchema>;
 
-export const topicSchema = z.object({
+export const threadsSchema = z.object({
   title: z.string().min(5, {
     message: 'Judul diskusi minimal harus 5 karakter.',
   }),

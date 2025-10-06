@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import React, { useState } from "react";
 import Link from "next/link";
 
-export function CreateTopic() {
+export function CreateThreads() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tagInput, setTagInput] = useState("");
