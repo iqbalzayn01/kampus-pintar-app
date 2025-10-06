@@ -54,13 +54,14 @@ export async function signup(
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   try {
-    const { name, email, password } = parsed.data;
+    const { name, email, password, university, faculty, studyProgram } =
+      parsed.data;
     const existingUser = await prisma.user.findUnique({
       where: {
         email,
       },
     });
-    if (existingUser) return { error: 'User already exists' };
+    if (existingUser) return { error: 'Email ini sudah terdaftar.' };
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -69,6 +70,9 @@ export async function signup(
         name,
         email,
         password: hashedPassword,
+        university,
+        faculty,
+        studyProgram,
         role: 'MEMBER',
       },
     });

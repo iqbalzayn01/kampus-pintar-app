@@ -19,7 +19,7 @@ import React, { useActionState } from 'react';
 import Link from 'next/link';
 
 const initialState: ActionResult = {
-  error: '',
+  error: null,
 };
 
 function SubmitButton() {

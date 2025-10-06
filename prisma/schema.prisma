@@ -21,38 +21,42 @@ model Threads {
   title          String
   content        String     @db.Text
   tags           String[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
   author         User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId       String
   responses      Response[]
   votes          Vote[]
   bestResponseId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Response {
-  id           String   @id @default(uuid())
-  content      String   @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id           String  @id @default(uuid())
+  content      String  @db.Text
+  author       User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId     String
-  thread       Threads  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  thread       Threads @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId     String
   votes        Vote[]
-  isBestAnswer Boolean  @default(false)
+  isBestAnswer Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Vote {
   id         String    @id @default(uuid())
   type       String
-  createdAt  DateTime  @default(now())
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   thread     Threads?  @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId   String?
   response   Response? @relation(fields: [responseId], references: [id], onDelete: Cascade)
   responseId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, threadId])
   @@unique([userId, responseId])
@@ -64,15 +68,20 @@ enum Role {
 }
 
 model User {
-  id            String     @id @default(uuid())
-  name          String?
-  email         String     @unique
-  password      String
-  role          Role       @default(MEMBER)
-  emailVerified DateTime?
-  image         String?
-  points        Int        @default(0)
-  threads       Threads[]
-  responses     Response[]
-  votes         Vote[]
+  id           String     @id @default(uuid())
+  name         String?
+  email        String     @unique
+  password     String
+  role         Role       @default(MEMBER)
+  image        String?
+  university   String?
+  faculty      String?
+  studyProgram String?
+  points       Int        @default(0)
+  threads      Threads[]
+  responses    Response[]
+  votes        Vote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

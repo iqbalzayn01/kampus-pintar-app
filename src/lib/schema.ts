@@ -14,11 +14,22 @@ export const loginSchema = z.object({
 
 export type LoginType = z.infer<typeof loginSchema>;
 
-export const signupSchema = loginSchema.extend({
-  name: z
-    .string({ error: 'Nama tidak valid' })
-    .min(3, 'Nama harus memiliki setidaknya 3 karakter'),
-});
+export const signupSchema = loginSchema
+  .extend({
+    name: z
+      .string({ error: 'Nama tidak valid' })
+      .min(3, 'Nama harus memiliki setidaknya 3 karakter'),
+    university: z.string().min(3, 'Nama universitas tidak boleh kosong.'),
+    faculty: z.string().min(3, 'Nama fakultas tidak boleh kosong.'),
+    studyProgram: z.string().min(3, 'Nama program studi tidak boleh kosong.'),
+    confirmPassword: z
+      .string()
+      .min(6, 'Password harus memiliki setidaknya 6 karakter'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Password dan konfirmasi password tidak cocok.',
+    path: ['confirmPassword'],
+  });
 
 export type SignupType = z.infer<typeof signupSchema>;
 

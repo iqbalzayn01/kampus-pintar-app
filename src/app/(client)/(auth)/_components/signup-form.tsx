@@ -19,7 +19,7 @@ import React, { useActionState } from 'react';
 import Link from 'next/link';
 
 const initialState: ActionResult = {
-  error: '',
+  error: null,
 };
 
 function SubmitButton() {
@@ -78,12 +78,54 @@ export function SignupForm({
                 />
               </div>
               <div className="grid gap-3">
+                <Label htmlFor="university">Universitas</Label>
+                <Input
+                  id="university"
+                  name="university"
+                  type="text"
+                  placeholder="Universitas Bina Sarana Informatika"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-3">
+                  <Label htmlFor="faculty">Fakultas</Label>
+                  <Input
+                    id="faculty"
+                    name="faculty"
+                    type="text"
+                    placeholder="Teknik & Informatika"
+                    required
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="studyProgram">Program Studi</Label>
+                  <Input
+                    id="studyProgram"
+                    name="studyProgram"
+                    type="text"
+                    placeholder="Sistem Informasi"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid gap-3">
                 <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
                   placeholder="********"
+                  required
+                />
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Ketik ulang password Anda"
                   required
                 />
               </div>
