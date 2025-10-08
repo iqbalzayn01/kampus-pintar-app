@@ -208,16 +208,18 @@ interface HandleVoteParams {
   threadId?: string;
   responseId?: string;
   voteType: 'UPVOTE' | 'DOWNVOTE';
+  path: string;
 }
 
 export async function handleVoteAction({
   threadId,
   responseId,
   voteType,
-}: HandleVoteParams): Promise<ActionResult> {
+  path,
+}: HandleVoteParams) {
   const session = await auth();
   if (!session?.user?.id) {
-    return { error: 'Anda harus login untuk memberi suara.' };
+    redirect('/login');
   }
   const userId = session.user.id;
 
@@ -243,9 +245,8 @@ export async function handleVoteAction({
       });
     }
   } catch (error) {
-    return { error: 'Gagal memproses suara.' };
+    console.error('Vote Action Error:', error);
   }
 
-  revalidatePath(threadId ? `/threads/${threadId}` : '/');
-  return { error: null, success: 'Suara berhasil diproses!' };
+  revalidatePath(path);
 }

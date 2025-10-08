@@ -1,12 +1,23 @@
-import { ArrowBigUp, ArrowBigDown, MessageSquare } from 'lucide-react';
+'use client';
+
+import { MessageSquare } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { VoteButtons } from './vote-buttons';
 import { ThreadsType } from '@/types';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-export function ThreadsCards({ threads }: { threads: ThreadsType[] }) {
+export function ThreadsCards({
+  threads,
+  currentUserId,
+}: {
+  threads: ThreadsType[];
+  currentUserId?: string;
+}) {
+  const pathname = usePathname();
+
   return (
     <div className="space-y-4">
       {threads.map((thread) => {
@@ -23,25 +34,13 @@ export function ThreadsCards({ threads }: { threads: ThreadsType[] }) {
             className="p-6 hover:bg-card-hover transition-colors border-border"
           >
             <div className="flex gap-4">
-              <div className="flex flex-col items-center gap-1 min-w-[40px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 hover:bg-secondary"
-                >
-                  <ArrowBigUp className="h-5 w-5" />
-                </Button>
-                <span className="text-sm font-semibold text-foreground">
-                  {thread._count.votes}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 hover:bg-secondary"
-                >
-                  <ArrowBigDown className="h-5 w-5" />
-                </Button>
-              </div>
+              <VoteButtons
+                itemId={thread.id}
+                itemType="thread"
+                initialVotes={thread.votes}
+                userId={currentUserId}
+                path={pathname}
+              />
 
               <div className="flex-1 min-w-0">
                 <Link href={`/threads/${thread.id}`}>

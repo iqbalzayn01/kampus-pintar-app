@@ -8,8 +8,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ResponseCard } from './response-card';
 import { ResponseForm } from './response-form';
+import { VoteButtons } from './vote-buttons';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-// import { VoteButtons } from './vote-buttons';
 
 type ThreadDetailViewProps = {
   thread: ThreadDetailType;
@@ -20,6 +21,7 @@ export function ThreadDetailView({
   thread,
   currentUserId,
 }: ThreadDetailViewProps) {
+  const pathname = usePathname();
   const isAuthor = currentUserId === thread.author.id;
 
   return (
@@ -34,12 +36,13 @@ export function ThreadDetailView({
       <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="flex gap-4">
-            {/* <VoteButtons
+            <VoteButtons
               itemId={thread.id}
               itemType="thread"
               initialVotes={thread.votes}
               userId={currentUserId}
-            /> */}
+              path={pathname}
+            />
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-4">{thread.title}</h1>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -96,6 +99,7 @@ export function ThreadDetailView({
               userId={currentUserId}
               isThreadAuthor={isAuthor}
               isBestAnswer={thread.bestResponseId === response.id}
+              // path={pathname}
             />
           ))}
         </div>

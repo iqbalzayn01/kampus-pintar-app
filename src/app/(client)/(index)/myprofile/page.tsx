@@ -9,6 +9,7 @@ import React from 'react';
 export default async function MyProfilePage() {
   const session = await auth();
   const threads = await getAllThreadsByUserId(session?.user?.id || '', 1, 10);
+  const currentUserId = session?.user?.id;
 
   if (!session?.user) return null;
 
@@ -25,7 +26,21 @@ export default async function MyProfilePage() {
       </section>
 
       <section className="space-y-4">
-        <ThreadsCards threads={threads} />
+        {threads.length > 0 ? (
+          <ThreadsCards threads={threads} currentUserId={currentUserId} />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-4">
+            <h2 className="text-2xl font-semibold text-foreground">
+              Belum ada thread
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Ayo jadi yang pertama untuk memulai diskusi!
+            </p>
+            <Button asChild>
+              <Link href="/threads/create">Mulai Diskusi</Link>
+            </Button>
+          </div>
+        )}
       </section>
     </main>
   );

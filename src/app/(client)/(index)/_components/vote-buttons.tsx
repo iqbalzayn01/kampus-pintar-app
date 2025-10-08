@@ -3,7 +3,7 @@
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
-import { handleVoteAction } from '@/lib/actions/votes.actions';
+import { handleVoteAction } from '../threads/lib/actions';
 import { Button } from '@/components/ui/button';
 
 type Vote = { userId: string; type: 'UPVOTE' | 'DOWNVOTE' };
@@ -12,6 +12,7 @@ type VoteButtonsProps = {
   itemType: 'thread' | 'response';
   initialVotes: Vote[];
   userId?: string;
+  path: string;
 };
 
 export function VoteButtons({
@@ -19,6 +20,7 @@ export function VoteButtons({
   itemType,
   initialVotes,
   userId,
+  path,
 }: VoteButtonsProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -28,10 +30,9 @@ export function VoteButtons({
     startTransition(async () => {
       const params =
         itemType === 'thread'
-          ? { threadId: itemId, voteType }
-          : { responseId: itemId, voteType };
-      const result = await handleVoteAction(params);
-      if (result?.error) toast.error(result.error);
+          ? { threadId: itemId, voteType, path }
+          : { responseId: itemId, voteType, path };
+      await handleVoteAction(params);
     });
   };
 

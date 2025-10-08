@@ -11,8 +11,9 @@ export async function getAllThreads(page: number = 1, limit: number = 10) {
         author: {
           select: { id: true, name: true, image: true },
         },
+        votes: true,
         _count: {
-          select: { responses: true, votes: true },
+          select: { responses: true },
         },
       },
       orderBy: {
@@ -94,8 +95,9 @@ export async function getAllThreadsByUserId(
         author: {
           select: { id: true, name: true, image: true },
         },
+        votes: true,
         _count: {
-          select: { responses: true, votes: true },
+          select: { responses: true },
         },
       },
       orderBy: {

@@ -21,8 +21,8 @@ export type ThreadsType = {
   };
   _count: {
     responses: number;
-    votes: number;
   };
+  votes: VotesType[];
   createdAt: Date;
   updatedAt: Date;
 };
