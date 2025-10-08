@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Logout } from '../_components/logout-form';
 import { getAllThreadsByUserId } from '../lib/data';
 import { ThreadsCards } from '../_components/threads-cards';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import React from 'react';
 
@@ -11,7 +12,9 @@ export default async function MyProfilePage() {
   const threads = await getAllThreadsByUserId(session?.user?.id || '', 1, 10);
   const currentUserId = session?.user?.id;
 
-  if (!session?.user) return null;
+  if (!session?.user) {
+    return redirect('/login');
+  }
 
   return (
     <main className="container mx-auto px-5 space-y-6">
