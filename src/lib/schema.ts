@@ -53,3 +53,9 @@ export const threadsSchema = z.object({
     message: 'Setidaknya harus ada satu tag.',
   }),
 });
+
+export const responseSchema = z.object({
+  content: z.string().min(10, {
+    message: 'Tanggapan minimal harus 10 karakter.',
+  }),
+});

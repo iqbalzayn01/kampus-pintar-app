@@ -45,9 +45,14 @@ model Response {
   updatedAt DateTime @updatedAt
 }
 
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
+
 model Vote {
   id         String    @id @default(uuid())
-  type       String
+  type       VoteType
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   thread     Threads?  @relation(fields: [threadId], references: [id], onDelete: Cascade)

@@ -1,7 +1,7 @@
 'use server';
 
 import { ActionResult } from '@/types';
-import { threadsSchema } from '@/lib/schema';
+import { threadsSchema, responseSchema } from '@/lib/schema';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
@@ -44,12 +44,16 @@ export async function createThread(
   redirect('/');
 }
 
-export async function getAllThreads() {
+export async function getAllThreads(page: number = 1, limit: number = 10) {
   try {
+    const skipAmount = (page - 1) * limit;
+
     const threads = await prisma.threads.findMany({
+      skip: skipAmount,
+      take: limit,
       include: {
         author: {
-          select: { name: true, image: true },
+          select: { id: true, name: true, image: true },
         },
         _count: {
           select: { responses: true, votes: true },
@@ -66,20 +70,49 @@ export async function getAllThreads() {
   }
 }
 
-export async function getThreadById(id: string) {
+export async function getThreadById(
+  id: string,
+  responsePage: number = 1,
+  responsesPerPage: number = 10
+) {
   try {
+    const skipAmount = (responsePage - 1) * responsesPerPage;
     const thread = await prisma.threads.findUnique({
       where: { id },
-      include: {
-        author: { select: { name: true, image: true, id: true } },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        tags: true,
+        authorId: true,
+        author: {
+          select: { id: true, name: true, image: true },
+        },
+        bestResponseId: true,
+        votes: true,
+        _count: {
+          select: { responses: true },
+        },
+
         responses: {
-          include: {
-            author: { select: { name: true, image: true, id: true } },
+          skip: skipAmount,
+          take: responsesPerPage,
+          select: {
+            id: true,
+            content: true,
+            isBestAnswer: true,
+            threadId: true,
+            createdAt: true,
+            updatedAt: true,
+            author: {
+              select: { id: true, name: true, image: true },
+            },
             votes: true,
           },
           orderBy: [{ isBestAnswer: 'desc' }, { createdAt: 'asc' }],
         },
-        votes: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     return thread;
@@ -153,4 +186,144 @@ export async function deleteThread(id: string): Promise<ActionResult> {
 
   revalidatePath('/');
   redirect('/');
+}
+
+// Response actions
+export async function createResponse(
+  _: unknown,
+  threadId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: 'Anda harus login untuk memberi tanggapan.' };
+  }
+
+  const parsed = responseSchema.safeParse({
+    content: formData.get('content'),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
+
+  try {
+    await prisma.response.create({
+      data: {
+        content: parsed.data.content,
+        authorId: session.user.id,
+        threadId: threadId,
+      },
+    });
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { points: { increment: 10 } },
+    });
+  } catch (error) {
+    console.error('Create Response Error:', error);
+    return { error: 'Gagal menyimpan tanggapan.' };
+  }
+
+  revalidatePath(`/threads/${threadId}`);
+  return { error: null, success: 'Tanggapan berhasil dikirim!' };
+}
+
+export async function markAsBestAnswerAction(
+  threadId: string,
+  responseId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: 'Anda harus login.' };
+  }
+
+  try {
+    const thread = await prisma.threads.findUnique({
+      where: { id: threadId },
+      select: { authorId: true },
+    });
+    if (thread?.authorId !== session.user.id) {
+      return {
+        error: 'Hanya pembuat diskusi yang bisa menandai jawaban terbaik.',
+      };
+    }
+
+    const response = await prisma.response.findUnique({
+      where: { id: responseId },
+      select: { authorId: true },
+    });
+    if (!response) return { error: 'Tanggapan tidak ditemukan.' };
+
+    await prisma.$transaction([
+      prisma.response.updateMany({
+        where: { threadId },
+        data: { isBestAnswer: false },
+      }),
+      prisma.response.update({
+        where: { id: responseId },
+        data: { isBestAnswer: true },
+      }),
+      prisma.threads.update({
+        where: { id: threadId },
+        data: { bestResponseId: responseId },
+      }),
+      prisma.user.update({
+        where: { id: response.authorId },
+        data: { points: { increment: 25 } },
+      }),
+    ]);
+  } catch (error) {
+    return { error: 'Gagal menandai jawaban.' };
+  }
+
+  revalidatePath(`/threads/${threadId}`);
+  return { error: null, success: 'Jawaban terbaik berhasil ditandai!' };
+}
+
+// Vote action
+interface HandleVoteParams {
+  threadId?: string;
+  responseId?: string;
+  voteType: 'UPVOTE' | 'DOWNVOTE';
+}
+
+export async function handleVoteAction({
+  threadId,
+  responseId,
+  voteType,
+}: HandleVoteParams): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: 'Anda harus login untuk memberi suara.' };
+  }
+  const userId = session.user.id;
+
+  const whereClause = threadId
+    ? { userId_threadId: { userId, threadId } }
+    : { userId_responseId: { userId, responseId: responseId! } };
+
+  try {
+    const existingVote = await prisma.vote.findUnique({ where: whereClause });
+
+    if (existingVote) {
+      if (existingVote.type === voteType) {
+        await prisma.vote.delete({ where: whereClause });
+      } else {
+        await prisma.vote.update({
+          where: whereClause,
+          data: { type: voteType },
+        });
+      }
+    } else {
+      await prisma.vote.create({
+        data: { type: voteType, userId, threadId, responseId },
+      });
+    }
+  } catch (error) {
+    return { error: 'Gagal memproses suara.' };
+  }
+
+  revalidatePath(threadId ? `/threads/${threadId}` : '/');
+  return { error: null, success: 'Suara berhasil diproses!' };
 }

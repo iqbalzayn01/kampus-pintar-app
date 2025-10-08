@@ -3,10 +3,10 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TypeThreads } from '@/types';
+import { ThreadsType } from '@/types';
 import Link from 'next/link';
 
-export function ThreadsCards({ threads }: { threads: TypeThreads[] }) {
+export function ThreadsCards({ threads }: { threads: ThreadsType[] }) {
   return (
     <div className="space-y-4">
       {threads.map((thread) => {

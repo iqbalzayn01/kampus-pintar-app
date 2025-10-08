@@ -10,7 +10,7 @@ export default auth(async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const url = req.nextUrl.clone();
 
-  const publicRoutes = ['/', '/topics', '/not-found', '/api'];
+  const publicRoutes = ['/', '/threads', '/not-found', '/api'];
   const authRoutes = ['/login', '/signup'];
 
   const isPublicRoute = publicRoutes.some((route) => {

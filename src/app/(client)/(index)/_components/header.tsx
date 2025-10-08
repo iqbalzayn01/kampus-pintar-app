@@ -60,7 +60,7 @@ export async function Header() {
             )}
 
             <Button asChild>
-              <Link href={session?.user ? '/topics/create' : '/login'}>
+              <Link href={session?.user ? '/threads/create' : '/login'}>
                 <PenSquare className="size-5" />
                 <span className="hidden sm:inline">New Topic</span>
               </Link>
