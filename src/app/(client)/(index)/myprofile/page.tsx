@@ -1,17 +1,20 @@
 import { auth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Logout } from '../_components/logout-form';
+import { getAllThreadsByUserId } from '../lib/data';
+import { ThreadsCards } from '../_components/threads-cards';
 import Link from 'next/link';
 import React from 'react';
 
 export default async function MyProfilePage() {
   const session = await auth();
+  const threads = await getAllThreadsByUserId(session?.user?.id || '', 1, 10);
 
   if (!session?.user) return null;
 
   return (
-    <main className="container mx-auto px-5">
-      <section className="flex flex-col items-center justify-center gap-1 min-h-screen">
+    <main className="container mx-auto px-5 space-y-6">
+      <section className="flex flex-col items-center justify-center gap-2">
         <h1 className="text-xl font-medium">{session?.user.name}</h1>
         <span className="text-base">{session?.user.email}</span>
         <span className="text-base">{session?.user.role}</span>
@@ -19,6 +22,10 @@ export default async function MyProfilePage() {
           <Link href={`/`}>Home</Link>
         </Button>
         <Logout />
+      </section>
+
+      <section className="space-y-4">
+        <ThreadsCards threads={threads} />
       </section>
     </main>
   );

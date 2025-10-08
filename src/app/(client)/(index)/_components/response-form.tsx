@@ -5,13 +5,15 @@ import { useFormStatus } from 'react-dom';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
-import { createResponse } from '../lib/actions';
+import { createResponse } from '../threads/lib/actions';
 import { ActionResult } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 
-const initialState: ActionResult = { error: null };
+const initialState: ActionResult = {
+  error: null,
+};
 
 function SubmitButton() {
   const { pending } = useFormStatus();

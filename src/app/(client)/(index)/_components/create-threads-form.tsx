@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { createThread } from '../lib/actions';
+import { createThread } from '../threads/lib/actions';
 import { ActionResult } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

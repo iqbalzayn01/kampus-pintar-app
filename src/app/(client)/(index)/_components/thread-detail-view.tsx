@@ -13,14 +13,14 @@ import Link from 'next/link';
 
 type ThreadDetailViewProps = {
   thread: ThreadDetailType;
-  // currentUserId?: string;
+  currentUserId?: string;
 };
 
 export function ThreadDetailView({
   thread,
-}: // currentUserId,
-ThreadDetailViewProps) {
-  // const isAuthor = currentUserId === thread.author.id;
+  currentUserId,
+}: ThreadDetailViewProps) {
+  const isAuthor = currentUserId === thread.author.id;
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl">
@@ -89,7 +89,7 @@ ThreadDetailViewProps) {
           {thread.responses.length} Tanggapan
         </h2>
         <div className="space-y-4">
-          {/* {thread.responses.map((response) => (
+          {thread.responses.map((response) => (
             <ResponseCard
               key={response.id}
               response={response}
@@ -97,12 +97,12 @@ ThreadDetailViewProps) {
               isThreadAuthor={isAuthor}
               isBestAnswer={thread.bestResponseId === response.id}
             />
-          ))} */}
+          ))}
         </div>
       </div>
 
       <Separator className="my-8" />
-      {/* <ResponseForm threadId={thread.id} /> */}
+      <ResponseForm threadId={thread.id} />
     </main>
   );
 }

@@ -8,7 +8,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 export async function createThread(
-  _: unknown,
+  prevState: unknown,
   formData: FormData
 ): Promise<ActionResult> {
   const session = await auth();
@@ -44,86 +44,8 @@ export async function createThread(
   redirect('/');
 }
 
-export async function getAllThreads(page: number = 1, limit: number = 10) {
-  try {
-    const skipAmount = (page - 1) * limit;
-
-    const threads = await prisma.threads.findMany({
-      skip: skipAmount,
-      take: limit,
-      include: {
-        author: {
-          select: { id: true, name: true, image: true },
-        },
-        _count: {
-          select: { responses: true, votes: true },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    return threads;
-  } catch (error) {
-    console.error('Error fetching all threads:', error);
-    return [];
-  }
-}
-
-export async function getThreadById(
-  id: string,
-  responsePage: number = 1,
-  responsesPerPage: number = 10
-) {
-  try {
-    const skipAmount = (responsePage - 1) * responsesPerPage;
-    const thread = await prisma.threads.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        tags: true,
-        authorId: true,
-        author: {
-          select: { id: true, name: true, image: true },
-        },
-        bestResponseId: true,
-        votes: true,
-        _count: {
-          select: { responses: true },
-        },
-
-        responses: {
-          skip: skipAmount,
-          take: responsesPerPage,
-          select: {
-            id: true,
-            content: true,
-            isBestAnswer: true,
-            threadId: true,
-            createdAt: true,
-            updatedAt: true,
-            author: {
-              select: { id: true, name: true, image: true },
-            },
-            votes: true,
-          },
-          orderBy: [{ isBestAnswer: 'desc' }, { createdAt: 'asc' }],
-        },
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-    return thread;
-  } catch (error) {
-    console.error(`Error fetching thread with ID ${id}:`, error);
-    return null;
-  }
-}
-
 export async function updateThread(
-  _: unknown,
+  prevState: unknown,
   id: string,
   formData: FormData
 ): Promise<ActionResult> {
@@ -190,8 +112,8 @@ export async function deleteThread(id: string): Promise<ActionResult> {
 
 // Response actions
 export async function createResponse(
-  _: unknown,
   threadId: string,
+  prevState: unknown,
   formData: FormData
 ): Promise<ActionResult> {
   const session = await auth();
