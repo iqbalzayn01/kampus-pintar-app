@@ -74,3 +74,23 @@ export type ThreadDetailType = {
     responses: number;
   };
 };
+
+export type UsersType = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  points: number;
+  university: string | null;
+  faculty: string | null;
+  studyProgram: string | null;
+  createdAt: Date;
+};
+
+export type GamificationType = {
+  users: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    points: number;
+  }[];
+};

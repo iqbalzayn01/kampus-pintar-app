@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { id } from 'zod/v4/locales';
 
 export async function getAllThreads(page: number = 1, limit: number = 10) {
   try {
@@ -108,6 +109,27 @@ export async function getAllThreadsByUserId(
     return threads;
   } catch (error) {
     console.error('Error fetching threads by user ID:', error);
+    return [];
+  }
+}
+
+export async function getAllUsersPoints() {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        points: true,
+      },
+      orderBy: {
+        points: 'desc',
+      },
+    });
+
+    return users;
+  } catch (error) {
+    console.error('Error fetching all users points:', error);
     return [];
   }
 }
