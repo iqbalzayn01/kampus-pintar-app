@@ -14,11 +14,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { VoteButtons } from './vote-buttons';
 import { ThreadsType } from '@/types';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { formatTimeAgo } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -26,11 +34,15 @@ import Link from 'next/link';
 export function ThreadsCards({
   threads,
   currentUserId,
+  totalPages,
 }: {
   threads: ThreadsType[];
   currentUserId?: string;
+  totalPages: number;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
 
   if (!threads || threads.length === 0) {
     return (
@@ -40,8 +52,14 @@ export function ThreadsCards({
     );
   }
 
+  const createPageURL = (pageNumber: number | string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNumber.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+
   return (
-    <div className="space-y-5">
+    <div className="flex-1 space-y-5">
       {threads.map((thread) => {
         const initials = (thread.author.name ?? 'A')
           .split(' ')
@@ -140,6 +158,47 @@ export function ThreadsCards({
           </Card>
         );
       })}
+
+      {totalPages > 1 && (
+        <Pagination className="mt-8">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href={createPageURL(currentPage - 1)}
+                aria-disabled={currentPage <= 1}
+                tabIndex={currentPage <= 1 ? -1 : undefined}
+                className={
+                  currentPage <= 1
+                    ? 'pointer-events-none opacity-50'
+                    : undefined
+                }
+              />
+            </PaginationItem>
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i + 1}>
+                <PaginationLink
+                  href={createPageURL(i + 1)}
+                  isActive={currentPage === i + 1}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href={createPageURL(currentPage + 1)}
+                aria-disabled={currentPage >= totalPages}
+                tabIndex={currentPage >= totalPages ? -1 : undefined}
+                className={
+                  currentPage >= totalPages
+                    ? 'pointer-events-none opacity-50'
+                    : undefined
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

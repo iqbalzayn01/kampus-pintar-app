@@ -3,15 +3,27 @@ import { getAllThreads, getAllUsersPoints } from './lib/data';
 import { ThreadsCards } from './_components/threads-cards';
 import { GamificationCard } from './_components/gamification-card';
 
-export default async function Home() {
-  const session = await auth();
-  const dataThreads = await getAllThreads();
-  const dataUsersPoints = await getAllUsersPoints();
+type PageProps = {
+  searchParams: { page?: string } | Promise<{ page?: string }>;
+};
+
+export default async function Home({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+  const currentPage = Number(resolvedSearchParams.page) || 1;
+
+  const [session, { threads, totalPages }, dataUsersPoints] = await Promise.all(
+    [auth(), getAllThreads(currentPage), getAllUsersPoints()]
+  );
+
   const currentUserId = session?.user?.id;
 
   return (
     <div className="container mx-auto px-5 flex gap-4">
-      <ThreadsCards threads={dataThreads} currentUserId={currentUserId} />
+      <ThreadsCards
+        threads={threads}
+        currentUserId={currentUserId}
+        totalPages={totalPages}
+      />
 
       <GamificationCard users={dataUsersPoints} />
     </div>

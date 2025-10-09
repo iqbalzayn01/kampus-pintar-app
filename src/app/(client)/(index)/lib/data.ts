@@ -1,30 +1,33 @@
 import prisma from '@/lib/prisma';
-import { id } from 'zod/v4/locales';
 
 export async function getAllThreads(page: number = 1, limit: number = 10) {
   try {
     const skipAmount = (page - 1) * limit;
 
-    const threads = await prisma.threads.findMany({
-      skip: skipAmount,
-      take: limit,
-      include: {
-        author: {
-          select: { id: true, name: true, image: true },
+    const [threads, totalThreadsCount] = await prisma.$transaction([
+      prisma.threads.findMany({
+        skip: skipAmount,
+        take: limit,
+        include: {
+          author: {
+            select: { id: true, name: true, image: true },
+          },
+          votes: true,
+          _count: { select: { responses: true } },
         },
-        votes: true,
-        _count: {
-          select: { responses: true },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    return threads;
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.threads.count(),
+    ]);
+
+    return {
+      threads,
+      totalPages: Math.ceil(totalThreadsCount / limit),
+      currentPage: page,
+    };
   } catch (error) {
     console.error('Error fetching all threads:', error);
-    return [];
+    return { threads: [], totalPages: 0, currentPage: 1 };
   }
 }
 
