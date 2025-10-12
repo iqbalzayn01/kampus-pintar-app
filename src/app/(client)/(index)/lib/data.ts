@@ -88,31 +88,44 @@ export async function getAllThreadsByUserId(
   page: number = 1,
   limit: number = 10
 ) {
+  if (!userId) {
+    return { threads: [], totalPages: 0 };
+  }
+
   const skipAmount = (page - 1) * limit;
 
   try {
-    const threads = await prisma.threads.findMany({
-      where: { authorId: userId },
-      skip: skipAmount,
-      take: limit,
-      include: {
-        author: {
-          select: { id: true, name: true, image: true },
+    const [threads, totalUserThreads] = await prisma.$transaction([
+      prisma.threads.findMany({
+        where: { authorId: userId },
+        skip: skipAmount,
+        take: limit,
+        include: {
+          author: {
+            select: { id: true, name: true, image: true },
+          },
+          votes: true,
+          _count: {
+            select: { responses: true },
+          },
         },
-        votes: true,
-        _count: {
-          select: { responses: true },
+        orderBy: {
+          createdAt: 'desc',
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+      }),
+      // Hitung hanya thread milik user tersebut
+      prisma.threads.count({
+        where: { authorId: userId },
+      }),
+    ]);
 
-    return threads;
+    return {
+      threads,
+      totalPages: Math.ceil(totalUserThreads / limit),
+    };
   } catch (error) {
     console.error('Error fetching threads by user ID:', error);
-    return [];
+    return { threads: [], totalPages: 0 };
   }
 }
 

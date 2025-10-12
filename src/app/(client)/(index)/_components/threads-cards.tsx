@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { VoteButtons } from './vote-buttons';
 import { ThreadsType } from '@/types';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { DeleteForm } from './delete-form';
 import { formatTimeAgo } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -121,10 +122,15 @@ export function ThreadsCards({
                         <Edit2 className="size-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash2 className="size-4 text-destructive" />
-                        Delete
-                      </DropdownMenuItem>
+                      <DeleteForm id={thread.id} path={pathname}>
+                        <DropdownMenuItem
+                          onSelect={(e) => e.preventDefault()}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="size-4 mr-2" />
+                          <span>Delete</span>
+                        </DropdownMenuItem>
+                      </DeleteForm>
                     </>
                   )}
                 </DropdownMenuContent>

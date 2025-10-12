@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { unknown } from 'zod';
 
 export async function createThread(
   prevState: unknown,
@@ -45,7 +46,7 @@ export async function createThread(
 }
 
 export async function updateThread(
-  prevState: unknown,
+  _prevState: unknown,
   id: string,
   formData: FormData
 ): Promise<ActionResult> {
@@ -84,7 +85,12 @@ export async function updateThread(
   redirect(`/threads/${id}`);
 }
 
-export async function deleteThread(id: string): Promise<ActionResult> {
+export async function deleteThread(
+  id: string,
+  path: string,
+  _prevState: unknown,
+  _formData: FormData
+): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { error: 'Harap login terlebih dahulu.' };
@@ -96,7 +102,11 @@ export async function deleteThread(id: string): Promise<ActionResult> {
       select: { authorId: true },
     });
 
-    if (thread?.authorId !== session.user.id && session.user.role !== 'ADMIN') {
+    if (!thread) {
+      return { error: 'Diskusi tidak ditemukan.' };
+    }
+
+    if (thread.authorId !== session.user.id && session.user.role !== 'ADMIN') {
       return { error: 'Anda tidak memiliki izin untuk menghapus diskusi ini.' };
     }
 
@@ -106,8 +116,9 @@ export async function deleteThread(id: string): Promise<ActionResult> {
     return { error: 'Gagal menghapus diskusi.' };
   }
 
+  revalidatePath(path);
   revalidatePath('/');
-  redirect('/');
+  return { error: null, success: 'Diskusi berhasil dihapus!' };
 }
 
 // Response actions
