@@ -124,7 +124,7 @@ export async function deleteThread(
 // Response actions
 export async function createResponse(
   threadId: string,
-  prevState: unknown,
+  _prevState: unknown,
   formData: FormData
 ): Promise<ActionResult> {
   const session = await auth();
