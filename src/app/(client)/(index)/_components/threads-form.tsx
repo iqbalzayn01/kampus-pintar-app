@@ -1,43 +1,61 @@
 'use client';
 
-import React, { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-import { createThread } from '../threads/lib/actions';
+import { createThread, updateThread } from '../threads/lib/actions';
 import { ActionResult } from '@/types';
+import { Threads } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import React, { useActionState, useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const initialState: ActionResult = {
   error: null,
 };
 
-function SubmitButton() {
+function SubmitButton({ type }: { type: string }) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="flex-1 sm:flex-none">
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Mengirim...
+          Harap Tunggu...
         </>
-      ) : (
+      ) : type === 'ADD' ? (
         'Buat Diskusi'
+      ) : (
+        'Edit Diskusi'
       )}
     </Button>
   );
 }
 
-export function CreateThreadsForm() {
-  const [state, formAction] = useActionState(createThread, initialState);
+interface ThreadsFormProps {
+  type: 'ADD' | 'EDIT';
+  data?: Threads;
+}
+
+export function ThreadsForm({ type = 'ADD', data }: ThreadsFormProps) {
+  const updateThreadById = (_: unknown, formData: FormData) => {
+    if (!data?.id) {
+      return { error: 'Id thread tidak ditemukan' };
+    }
+
+    return updateThread(_, formData, data.id);
+  };
+
+  const [state, formAction] = useActionState(
+    type === 'ADD' ? createThread : updateThreadById,
+    initialState
+  );
   const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(data?.tags || []);
 
   useEffect(() => {
     if (state?.error) {
@@ -74,7 +92,7 @@ export function CreateThreadsForm() {
 
         <div className="bg-card rounded-lg border border-border p-6 sm:p-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Buat Diskusi Baru
+            {type === 'ADD' ? 'Buat Diskusi Baru' : 'Edit Diskusi'}
           </h1>
           <p className="text-muted-foreground mb-8">
             Bagikan pertanyaan atau topik akademik Anda dengan komunitas.
@@ -88,6 +106,7 @@ export function CreateThreadsForm() {
                 name="title"
                 placeholder="Apa pertanyaan atau judul diskusi Anda?"
                 className="text-base"
+                defaultValue={data?.title}
                 required
               />
             </div>
@@ -99,6 +118,7 @@ export function CreateThreadsForm() {
                 name="content"
                 placeholder="Jelaskan detail diskusi Anda di sini..."
                 className="min-h-[200px] text-base"
+                defaultValue={data?.content}
                 required
               />
             </div>
@@ -114,6 +134,7 @@ export function CreateThreadsForm() {
                 className="text-base"
               />
               <input type="hidden" name="tags" value={tags.join(',')} />
+              {}
 
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
@@ -132,7 +153,7 @@ export function CreateThreadsForm() {
             </div>
 
             <div className="flex gap-3 pt-4">
-              <SubmitButton />
+              <SubmitButton type={type} />
               <Button
                 type="button"
                 variant="outline"

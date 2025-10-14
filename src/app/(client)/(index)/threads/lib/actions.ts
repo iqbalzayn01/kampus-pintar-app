@@ -6,10 +6,9 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { unknown } from 'zod';
 
 export async function createThread(
-  prevState: unknown,
+  _: unknown,
   formData: FormData
 ): Promise<ActionResult> {
   const session = await auth();
@@ -46,9 +45,9 @@ export async function createThread(
 }
 
 export async function updateThread(
-  _prevState: unknown,
-  id: string,
-  formData: FormData
+  _: unknown,
+  formData: FormData,
+  id: string
 ): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -56,6 +55,7 @@ export async function updateThread(
   }
 
   const thread = await prisma.threads.findUnique({ where: { id: id } });
+
   if (!thread || thread.authorId !== session.user.id) {
     return { error: 'Anda tidak memiliki izin untuk mengedit diskusi ini.' };
   }
@@ -88,7 +88,7 @@ export async function updateThread(
 export async function deleteThread(
   id: string,
   path: string,
-  _prevState: unknown,
+  _: unknown,
   _formData: FormData
 ): Promise<ActionResult> {
   const session = await auth();
@@ -124,7 +124,7 @@ export async function deleteThread(
 // Response actions
 export async function createResponse(
   threadId: string,
-  _prevState: unknown,
+  _: unknown,
   formData: FormData
 ): Promise<ActionResult> {
   const session = await auth();

@@ -118,9 +118,11 @@ export function ThreadsCards({
                   </DropdownMenuItem>
                   {thread.author.id === currentUserId && (
                     <>
-                      <DropdownMenuItem>
-                        <Edit2 className="size-4" />
-                        Edit
+                      <DropdownMenuItem asChild>
+                        <Link href={`/threads/edit/${thread.id}`}>
+                          <Edit2 className="size-4" />
+                          Edit
+                        </Link>
                       </DropdownMenuItem>
                       <DeleteForm id={thread.id} path={pathname}>
                         <DropdownMenuItem
