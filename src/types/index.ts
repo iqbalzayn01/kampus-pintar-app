@@ -86,6 +86,14 @@ export type UsersType = {
   createdAt: Date;
 };
 
+export type SessionType = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  avatar?: string | null | undefined;
+  role: string;
+};
+
 export type GamificationType = {
   users: {
     id: string;
