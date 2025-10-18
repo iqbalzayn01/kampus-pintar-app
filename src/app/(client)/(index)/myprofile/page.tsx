@@ -48,7 +48,7 @@ export default async function MyProfilePage() {
               Ayo jadi yang pertama untuk memulai diskusi!
             </p>
             <Button asChild>
-              <Link href="/threads/new">Mulai Diskusi</Link>
+              <Link href="/threads/create">Mulai Diskusi</Link>
             </Button>
           </div>
         )}
