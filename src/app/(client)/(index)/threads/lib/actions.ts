@@ -230,8 +230,9 @@ export async function handleVoteAction({
 }: HandleVoteParams) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect('/login');
+    return { error: 'Harap login terlebih dahulu.' };
   }
+
   const userId = session.user.id;
 
   const whereClause = threadId
@@ -257,6 +258,7 @@ export async function handleVoteAction({
     }
   } catch (error) {
     console.error('Vote Action Error:', error);
+    return { error: 'Gagal memproses vote.' };
   }
 
   revalidatePath(path);
