@@ -13,7 +13,6 @@ type VoteButtonsProps = {
   itemType: 'thread' | 'response';
   initialVotes: Vote[];
   userId?: string;
-  path: string;
 };
 
 export function VoteButtons({
@@ -21,7 +20,6 @@ export function VoteButtons({
   itemType,
   initialVotes,
   userId,
-  path,
 }: VoteButtonsProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -79,8 +77,14 @@ export function VoteButtons({
 
         const params =
           itemType === 'thread'
-            ? { threadId: itemId, voteType, path }
-            : { responseId: itemId, voteType, path };
+            ? {
+                threadId: itemId,
+                voteType,
+              }
+            : {
+                responseId: itemId,
+                voteType,
+              };
 
         const result = await handleVoteAction(params);
 
@@ -89,7 +93,7 @@ export function VoteButtons({
         }
       });
     },
-    [userId, itemType, itemId, path, setOptimisticVote]
+    [userId, itemType, itemId, , setOptimisticVote]
   );
 
   return (
@@ -99,7 +103,6 @@ export function VoteButtons({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => handleVote('UPVOTE')}
-        disabled={isPending || !userId}
         aria-label="Upvote"
       >
         <ArrowBigUp className="h-5 w-5" />
@@ -115,7 +118,6 @@ export function VoteButtons({
         size="sm"
         className="h-8 w-8 p-0"
         onClick={() => handleVote('DOWNVOTE')}
-        disabled={isPending || !userId}
         aria-label="Downvote"
       >
         <ArrowBigDown className="h-5 w-5" />

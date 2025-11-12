@@ -121,7 +121,6 @@ export async function deleteThread(
   return { error: null, success: 'Diskusi berhasil dihapus!' };
 }
 
-// Response actions
 export async function createResponse(
   threadId: string,
   _: unknown,
@@ -214,7 +213,6 @@ export async function markAsBestAnswerAction(
   return { error: null, success: 'Jawaban terbaik berhasil ditandai!' };
 }
 
-// Vote action
 interface HandleVoteParams {
   threadId?: string;
   responseId?: string;
@@ -223,55 +221,6 @@ interface HandleVoteParams {
 }
 
 export async function handleVoteAction({
-  threadId,
-  responseId,
-  voteType,
-  path,
-}: HandleVoteParams): Promise<ActionResult> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { error: 'Harap login terlebih dahulu.' };
-  }
-
-  const userId = session.user.id;
-
-  const whereClause = threadId
-    ? { userId_threadId: { userId, threadId } }
-    : { userId_responseId: { userId, responseId: responseId! } };
-
-  try {
-    await prisma.$transaction(async (tx) => {
-      const existingVote = await tx.vote.findUnique({
-        where: whereClause,
-        select: { type: true },
-      });
-
-      if (existingVote) {
-        if (existingVote.type === voteType) {
-          await tx.vote.delete({ where: whereClause });
-        } else {
-          await tx.vote.update({
-            where: whereClause,
-            data: { type: voteType },
-          });
-        }
-      } else {
-        await tx.vote.create({
-          data: { type: voteType, userId, threadId, responseId },
-        });
-      }
-    });
-
-    revalidatePath(path);
-
-    return { error: null, success: '' };
-  } catch (error) {
-    console.error('Vote Action Error:', error);
-    return { error: 'Gagal memproses vote.' };
-  }
-}
-
-export async function handleVoteActionWithTags({
   threadId,
   responseId,
   voteType,

@@ -77,7 +77,6 @@ export function ThreadsCards({
                 itemType="thread"
                 initialVotes={thread.votes}
                 userId={currentUserId}
-                path={pathname}
               />
 
               <div className="flex flex-col flex-1 gap-2">
