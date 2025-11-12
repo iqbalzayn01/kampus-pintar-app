@@ -1,35 +1,23 @@
-import { ArchiveX, File, Inbox, Send, Trash2 } from 'lucide-react';
+import { HomeIcon, CircleQuestionMark, ChartBar } from 'lucide-react';
 
 export const navLinks = {
   navMain: [
     {
-      title: 'Inbox',
-      url: '#',
-      icon: Inbox,
+      title: 'Home',
+      url: '/',
+      icon: HomeIcon,
       isActive: true,
     },
     {
-      title: 'Drafts',
+      title: 'Questions',
       url: '#',
-      icon: File,
+      icon: CircleQuestionMark,
       isActive: false,
     },
     {
-      title: 'Sent',
+      title: 'Leaderboards',
       url: '#',
-      icon: Send,
-      isActive: false,
-    },
-    {
-      title: 'Junk',
-      url: '#',
-      icon: ArchiveX,
-      isActive: false,
-    },
-    {
-      title: 'Trash',
-      url: '#',
-      icon: Trash2,
+      icon: ChartBar,
       isActive: false,
     },
   ],

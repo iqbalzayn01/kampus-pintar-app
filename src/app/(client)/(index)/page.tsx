@@ -18,7 +18,7 @@ export default async function Home({ searchParams }: PageProps) {
   const currentUserId = session?.user?.id;
 
   return (
-    <div className="container mx-auto px-5 flex gap-4">
+    <div className="container mx-auto  flex gap-4 px-5 py-4">
       <ThreadsCards
         threads={threads}
         currentUserId={currentUserId}

@@ -13,7 +13,7 @@ export function GamificationCard({ users }: GamificationType) {
   }
 
   return (
-    <Card className="h-full">
+    <Card className="h-fit">
       <CardHeader>
         <CardTitle>Points</CardTitle>
       </CardHeader>
@@ -29,7 +29,7 @@ export function GamificationCard({ users }: GamificationType) {
                 <AvatarFallback className="text-[10px]">{name}</AvatarFallback>
               </Avatar>
               <h2>{name}</h2>
-              <p>{points} points</p>
+              <p>{points} pts</p>
             </div>
           </div>
         ))}
