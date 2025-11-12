@@ -41,7 +41,6 @@ export function ThreadDetailView({
               itemType="thread"
               initialVotes={thread.votes}
               userId={currentUserId}
-              path={pathname}
             />
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-4">{thread.title}</h1>
