@@ -3,7 +3,7 @@
 import { ActionResult } from '@/types';
 import { threadsSchema, responseSchema } from '@/lib/schema';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
@@ -227,7 +227,7 @@ export async function handleVoteAction({
   responseId,
   voteType,
   path,
-}: HandleVoteParams) {
+}: HandleVoteParams): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { error: 'Harap login terlebih dahulu.' };
@@ -240,26 +240,81 @@ export async function handleVoteAction({
     : { userId_responseId: { userId, responseId: responseId! } };
 
   try {
-    const existingVote = await prisma.vote.findUnique({ where: whereClause });
+    await prisma.$transaction(async (tx) => {
+      const existingVote = await tx.vote.findUnique({
+        where: whereClause,
+        select: { type: true },
+      });
 
-    if (existingVote) {
-      if (existingVote.type === voteType) {
-        await prisma.vote.delete({ where: whereClause });
+      if (existingVote) {
+        if (existingVote.type === voteType) {
+          await tx.vote.delete({ where: whereClause });
+        } else {
+          await tx.vote.update({
+            where: whereClause,
+            data: { type: voteType },
+          });
+        }
       } else {
-        await prisma.vote.update({
-          where: whereClause,
-          data: { type: voteType },
+        await tx.vote.create({
+          data: { type: voteType, userId, threadId, responseId },
         });
       }
-    } else {
-      await prisma.vote.create({
-        data: { type: voteType, userId, threadId, responseId },
-      });
-    }
+    });
+
+    revalidatePath(path);
+
+    return { error: null, success: '' };
   } catch (error) {
     console.error('Vote Action Error:', error);
     return { error: 'Gagal memproses vote.' };
   }
+}
 
-  revalidatePath(path);
+export async function handleVoteActionWithTags({
+  threadId,
+  responseId,
+  voteType,
+}: Omit<HandleVoteParams, 'path'>): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: 'Harap login terlebih dahulu.' };
+  }
+
+  const userId = session.user.id;
+  const whereClause = threadId
+    ? { userId_threadId: { userId, threadId } }
+    : { userId_responseId: { userId, responseId: responseId! } };
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const existingVote = await tx.vote.findUnique({
+        where: whereClause,
+        select: { type: true },
+      });
+
+      if (existingVote) {
+        if (existingVote.type === voteType) {
+          await tx.vote.delete({ where: whereClause });
+        } else {
+          await tx.vote.update({
+            where: whereClause,
+            data: { type: voteType },
+          });
+        }
+      } else {
+        await tx.vote.create({
+          data: { type: voteType, userId, threadId, responseId },
+        });
+      }
+    });
+
+    const tag = threadId ? `thread-${threadId}` : `response-${responseId}`;
+    revalidateTag(tag);
+
+    return { error: null, success: '' };
+  } catch (error) {
+    console.error('Vote Action Error:', error);
+    return { error: 'Gagal memproses vote.' };
+  }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useOptimistic } from 'react';
+import { useTransition, useOptimistic, useCallback } from 'react';
 import { toast } from 'sonner';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
 import { handleVoteAction } from '../threads/lib/actions';
@@ -67,24 +67,30 @@ export function VoteButtons({
     }
   );
 
-  const handleVote = (voteType: 'UPVOTE' | 'DOWNVOTE') => {
-    if (!userId) return toast.error('Anda harus login untuk memberi suara.');
-
-    startTransition(async () => {
-      setOptimisticVote(voteType);
-
-      const params =
-        itemType === 'thread'
-          ? { threadId: itemId, voteType, path }
-          : { responseId: itemId, voteType, path };
-
-      try {
-        await handleVoteAction(params);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Vote gagal');
+  const handleVote = useCallback(
+    (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+      if (!userId) {
+        toast.error('Anda harus login untuk memberi suara.');
+        return;
       }
-    });
-  };
+
+      startTransition(async () => {
+        setOptimisticVote(voteType);
+
+        const params =
+          itemType === 'thread'
+            ? { threadId: itemId, voteType, path }
+            : { responseId: itemId, voteType, path };
+
+        const result = await handleVoteAction(params);
+
+        if (result?.error) {
+          toast.error(result.error);
+        }
+      });
+    },
+    [userId, itemType, itemId, path, setOptimisticVote]
+  );
 
   return (
     <div className="flex flex-col items-center gap-1 min-w-[40px] pt-1">
@@ -94,10 +100,14 @@ export function VoteButtons({
         className="h-8 w-8 p-0"
         onClick={() => handleVote('UPVOTE')}
         disabled={isPending || !userId}
+        aria-label="Upvote"
       >
         <ArrowBigUp className="h-5 w-5" />
       </Button>
-      <span className="text-sm font-semibold text-foreground">
+      <span
+        className="text-sm font-semibold text-foreground"
+        aria-live="polite"
+      >
         {optimisticState.totalVotes}
       </span>
       <Button
@@ -106,6 +116,7 @@ export function VoteButtons({
         className="h-8 w-8 p-0"
         onClick={() => handleVote('DOWNVOTE')}
         disabled={isPending || !userId}
+        aria-label="Downvote"
       >
         <ArrowBigDown className="h-5 w-5" />
       </Button>

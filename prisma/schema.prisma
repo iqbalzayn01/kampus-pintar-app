@@ -65,6 +65,10 @@ model Vote {
 
   @@unique([userId, threadId])
   @@unique([userId, responseId])
+  @@index([threadId], name: "idx_vote_threadId")
+  @@index([responseId], name: "idx_vote_responseId")
+  @@index([userId], name: "idx_vote_userId")
+  @@map("votes")
 }
 
 enum Role {
