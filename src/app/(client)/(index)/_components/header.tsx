@@ -47,7 +47,7 @@ export async function Header() {
             <ModeToggle />
 
             {session?.user ? (
-              <div className="flex gap-4 items-center flex-col sm:flex-row">
+              <div className="flex gap-3 items-center flex-col sm:flex-row">
                 <Button
                   variant="outline"
                   size="icon"
@@ -60,7 +60,7 @@ export async function Header() {
                 </Button>
               </div>
             ) : (
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-3 items-center">
                 <Button variant="outline" asChild>
                   <Link href="/login">Login</Link>
                 </Button>

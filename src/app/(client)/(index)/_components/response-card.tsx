@@ -79,7 +79,7 @@ export function ResponseCard({
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-foreground mb-4 leading-relaxed whitespace-pre-wrap">
+          <p className="text-foreground mb-4 leading-relaxed  break-all whitespace-pre-wrap">
             {response.content}
           </p>
           {/* {isThreadAuthor && !isBestAnswer && (

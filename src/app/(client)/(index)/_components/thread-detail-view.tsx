@@ -51,7 +51,7 @@ export function ThreadDetailView({
                   </Badge>
                 ))}
               </div>
-              <p className="text-foreground mb-6 leading-relaxed whitespace-pre-wrap">
+              <p className="text-foreground mb-6 leading-relaxed break-all whitespace-pre-wrap">
                 {thread.content}
               </p>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">

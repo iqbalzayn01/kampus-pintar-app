@@ -23,7 +23,7 @@ export default async function Home({ searchParams }: PageProps) {
   const currentUserId = session?.user?.id;
 
   return (
-    <div className="container mx-auto flex gap-4 px-5 py-4">
+    <div className="container mx-auto lg:flex gap-4 px-5 py-4">
       <div className="flex-1 flex flex-col gap-4">
         <div className="relative flex w-full items-center ">
           <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
