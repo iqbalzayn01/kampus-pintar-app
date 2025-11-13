@@ -82,12 +82,12 @@ export function ThreadsCards({
               <div className="flex flex-col flex-1 gap-2">
                 <Link
                   href={`/threads/${thread.id}`}
-                  className="text-xl font-semibold hover:underline"
+                  className="text-base md:text-xl font-semibold hover:underline"
                 >
                   <h2>{thread.title}</h2>
                 </Link>
 
-                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                <p className="text-sm text-muted-foreground line-clamp-1 mb-4">
                   {thread.content}
                 </p>
 

@@ -3,20 +3,14 @@ import { HomeIcon, CircleQuestionMark, ChartBar } from 'lucide-react';
 export const navLinks = {
   navMain: [
     {
-      title: 'Home',
-      url: '/',
-      icon: HomeIcon,
-      isActive: true,
-    },
-    {
       title: 'Questions',
-      url: '#',
+      url: '/',
       icon: CircleQuestionMark,
       isActive: false,
     },
     {
       title: 'Leaderboards',
-      url: '#',
+      url: '/leaderboards',
       icon: ChartBar,
       isActive: false,
     },

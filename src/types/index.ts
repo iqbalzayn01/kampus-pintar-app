@@ -100,5 +100,6 @@ export type GamificationType = {
     name: string | null;
     image: string | null;
     points: number;
+    role: string;
   }[];
 };

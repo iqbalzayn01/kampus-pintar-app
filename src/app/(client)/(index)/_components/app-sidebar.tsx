@@ -1,4 +1,4 @@
-import * as Reasct from 'react';
+import * as React from 'react';
 import Link from 'next/link';
 
 import {
@@ -17,8 +17,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       {...props}
     >
-      <SidebarContent>
-        <SidebarMenu className="p-2">
+      <SidebarContent className="p-4 md:p-2">
+        <SidebarMenu>
           {navLinks.navMain.map((link) => (
             <SidebarMenuItem key={link.title}>
               <SidebarMenuButton size="lg" tooltip={link.title} asChild>

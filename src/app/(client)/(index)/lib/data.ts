@@ -136,6 +136,7 @@ export async function getAllUsersPoints() {
         name: true,
         image: true,
         points: true,
+        role: true,
       },
       orderBy: {
         points: 'desc',
